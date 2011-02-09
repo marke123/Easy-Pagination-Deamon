@@ -1,0 +1,15 @@
+/* The List outer wrapper */
+ul.pagination {  }
+	/* A single list element, incl. first/last/prev/next/direct */
+	li.page-num {  }
+		/* Specific li items: */
+		li.page-num-first {  }
+			li.page-num-first a {  }
+		li.page-num-last {  }
+			li.page-num-first a {  }
+		li.page-num-next {  }
+			li.page-num-first a {  }
+		li.page-num-prev {  }
+			li.page-num-first a {  }
+			/* or targeting the numbers directly: */
+			.page-num-link {  }
