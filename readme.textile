@@ -1,6 +1,6 @@
 h2. Easy Pagination Deamon
 
-version: _v0.1.1_
+version: _v0.1.2_
 
 * Gives you an easy pagination for ex. archives, search results, blog
  
@@ -10,13 +10,13 @@ h3. Example
 
 When inserted it looks like the following:
 First << 1 2 3 4 5 >> Last
-_The "first"/"last"/"<<"/">>" only get's added if you're not on the first/last page_
+_(The "first"/"last"/"<<"/">>" only get's added if you're not on the first/last page)_
 
 h3. How-to
 
-Simply add oxo_pagination(); to your template files.
+Simply add get_pagination_links(); to your template files.
 
-You can specify a $range ex. oxo_pagination( 9 ); which would display
+You can specify a $range ex. get_pagination_links( 9 ); which would display
 9 links to pages, where the current one is in the middle.
 The default is "5". You should always use a not even number.
 
@@ -31,4 +31,5 @@ h4. Changelog
 
 * _v0.1_ first version
 * _v0.1.1_ added a readme.textile file
+* _v0.1.2_ renamed the template tag
 

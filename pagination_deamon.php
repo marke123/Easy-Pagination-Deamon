@@ -34,27 +34,28 @@ if( !class_exists('WP') ) :
 endif;
 
 !defined('PAGE_LANG') ? define( 'PAGE_LANG', 'pagination_deamon_lang' ) : wp_die('The constant PAGE_LANG is already defined.');
-!defined('PAGE_VERSION') ? define( 'PAGE_VERSION', 0.1 ) : wp_die('The constant PAGE_VERSION is already defined.');
+!defined('PAGE_VERSION') ? define( 'PAGE_VERSION', 0.1.2 ) : wp_die('The constant PAGE_VERSION is already defined.');
 !defined('PAGE_PATH') ? define( 'PAGE_PATH', trailingslashit(WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__))) ) : wp_die('The constant PAGE_PATH is already defined.');
 
-	/**
-	 * Register styles
-	 */
-	if ( !is_admin() ) {
+	// Register styles
+	if ( !is_admin() )
 		wp_register_style( 'pagination', PAGE_PATH.'pagination.css', false, PAGE_VERSION, 'screen' );
-	}
 
-	if ( !function_exists('oxo_pagination_styles') ) :
+	if ( !function_exists('print_pagination_styles') ) :
 	/**
 	 * Print styles
 	 */
-	function oxo_pagination_styles() {
+	function print_pagination_styles() {
 		if ( !is_admin() )
 			wp_print_styles('pagination');
 	}
 	endif;
 
-	if ( !function_exists('oxo_pagination') ) :
+	// print the pagination styles outside admin UI pages
+	if ( !is_admin() )
+		print_pagination_styles();
+
+	if ( !function_exists('get_pagination_links') ) :
 	/**
 	 * Wordpress pagination for archives/search/etc.
 	 * 
@@ -68,7 +69,7 @@ endif;
 	 * 
 	 * @param (int) $range
 	 */
-	function oxo_pagination( $range = 5 ) {
+	function get_pagination_links( $range = 5 ) {
 		// $paged - number of the current page
 		global $paged, $wp_query;
 		// How much pages do we have?
@@ -81,7 +82,7 @@ endif;
 		echo "\n".'<ul class="pagination">'."\n";
 			// On the first page, don't put the First page link
 			if ( $paged != 1 )
-				echo '<li class="page-num page-num-first"><a href='.get_pagenum_link(1).'>'.__('First', PAGE_LANG).' </a></li>';
+				echo '<li class="page-num page-num-first"><a href='.get_pagenum_link(1).'>'.__('First', PAGE_LANG).' </a></li>'."\n";
 		
 			// To the previous page
 			echo '<li class="page-num page-num-prev">';
@@ -94,39 +95,39 @@ endif;
 				if ( $paged < $range ) :
 					for ( $i = 1; $i <= ($range + 1); $i++ ) {
 						$class = $i == $paged ? 'current' : '';
-						echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>';
+						echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>'."\n";
 					}
 				// When closer to the end
 				elseif ( $paged >= ( $max_page - ceil($range/2)) ) :
 					for ( $i = $max_page - $range; $i <= $max_page; $i++ ){
 						$class = $i == $paged ? 'current' : '';
-						echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>';
+						echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>'."\n";
 					}
 				endif;
 			// Somewhere in the middle
 			elseif ( $paged >= $range && $paged < ( $max_page - ceil($range/2)) ) :
 				for ( $i = ($paged - ceil($range/2)); $i <= ($paged + ceil($range/2)); $i++ ) {
 						$class = $i == $paged ? 'current' : '';
-					echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>';
+					echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>'."\n";
 				}
 			// Less pages than the range, no sliding effect needed
 			else :
 				for ( $i = 1; $i <= $max_page; $i++ ) {
 					$class = $i == $paged ? 'current' : '';
-					echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>';
+					echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>'."\n";
 				}
 			endif;
 		
 			// Next page
 			echo '<li class="page-num page-num-next">';
 				next_posts_link(' &raquo; '); // »
-			echo '</li>';
+			echo '</li>'."\n";
 		
 			// On the last page, don't put the Last page link
 			if ( $paged != $max_page )
-				echo '<li class="page-num page-num-last"><a href='.get_pagenum_link($max_page).'> '.__('Last', PAGE_LANG).'</a></li>';
+				echo '<li class="page-num page-num-last"><a href='.get_pagenum_link($max_page).'> '.__('Last', PAGE_LANG).'</a></li>'."\n";
 	
-		echo "\n".'</ul>'."\n";
+		echo '</ul>'."\n";
 	}
 	endif;
 ?>
