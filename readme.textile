@@ -1,0 +1,34 @@
+h2. Easy Pagination Deamon
+
+version: _v0.1.1_
+
+* Gives you an easy pagination for ex. archives, search results, blog
+ 
+----------------------------------------------------------------
+
+h3. Example
+
+When inserted it looks like the following:
+First << 1 2 3 4 5 >> Last
+_The "first"/"last"/"<<"/">>" only get's added if you're not on the first/last page_
+
+h3. How-to
+
+Simply add oxo_pagination(); to your template files.
+
+You can specify a $range ex. oxo_pagination( 9 ); which would display
+9 links to pages, where the current one is in the middle.
+The default is "5". You should always use a not even number.
+
+h3. Languages
+
+It's prepared for a language file that translates "First" & "Last",
+but so far you'd have to add that yourself.
+ 
+----------------------------------------------------------------
+
+h4. Changelog
+
+* _v0.1_ first version
+* _v0.1.1_ added a readme.textile file
+
