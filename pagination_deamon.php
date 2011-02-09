@@ -2,7 +2,7 @@
 /*
 Plugin Name:	Easy Pagination Deamon
 Plugin URI:		http://wordpress.org/extend/plugins/stats/
-Description:	Offers the deamon_pagination($range) template tag for a sematically correct pagination.
+Description:	Offers the get_pagination_links($range) template tag for a sematically correct pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
 Version:		0.1
