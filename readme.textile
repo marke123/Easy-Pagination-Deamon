@@ -1,9 +1,9 @@
 h2. Easy Pagination Deamon
 
-version: _v0.1.2_
+version: _v0.1.3_
 
 * Gives you an easy pagination for ex. archives, search results, blog
- 
+
 ----------------------------------------------------------------
 
 h3. Example
@@ -24,7 +24,7 @@ h3. Languages
 
 It's prepared for a language file that translates "First" & "Last",
 but so far you'd have to add that yourself.
- 
+
 ----------------------------------------------------------------
 
 h4. Changelog
@@ -32,4 +32,5 @@ h4. Changelog
 * _v0.1_ first version
 * _v0.1.1_ added a readme.textile file
 * _v0.1.2_ renamed the template tag
-
+* _v0.1.2.1_ minor
+* _v0.1.3_ use the native get_adjacent_post() fn instead of the previous_/next_posts_link() alias
