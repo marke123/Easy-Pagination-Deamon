@@ -86,7 +86,10 @@ endif;
 		
 			// To the previous page
 			echo '<li class="page-num page-num-prev">';
-				previous_posts_link(' &laquo; '); // «
+				# let's use the native fn instead of the previous_/next_posts_link() alias
+				# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
+				echo get_adjacent_post( false, '', true );
+				# previous_posts_link(' &laquo; '); // «
 			echo '</li>';
 		
 			// We need the sliding effect only if there are more pages than is the sliding range
@@ -120,7 +123,10 @@ endif;
 		
 			// Next page
 			echo '<li class="page-num page-num-next">';
-				next_posts_link(' &raquo; '); // »
+				# let's use the native fn instead of the previous_/next_posts_link() alias
+				# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
+				echo get_adjacent_post( false, '', false );
+				# next_posts_link(' &raquo; '); // »
 			echo '</li>'."\n";
 		
 			// On the last page, don't put the Last page link
