@@ -1,10 +1,12 @@
 h2. Easy Pagination Deamon
 
-version: _v0.1.3_
+version: _v0.1.3.1_
 
 * Gives you an easy pagination for ex. archives, search results, blog
 * Works with every type of permalink structure
 * Uses the native get_adjacent_post() fn instead of the previous_posts_link() layer
+
+To come within the next days: Works on single post pages too.
 
 ----------------------------------------------------------------
 
@@ -36,3 +38,4 @@ h4. Changelog
 * _v0.1.2_ renamed the template tag
 * _v0.1.2.1_ minor
 * _v0.1.3_ use the native get_adjacent_post() fn instead of the previous_/next_posts_link() alias
+* _v0.1.3.1_ Bugfix: get_adjacent_posts() now works without issues on object/post type list templates

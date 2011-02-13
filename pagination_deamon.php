@@ -5,7 +5,7 @@ Plugin URI:		http://wordpress.org/extend/plugins/stats/
 Description:	Offers the get_pagination_links($range) template tag for a sematically correct pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.3
+Version:		0.1.3.1
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Text Domain:	pagination_deamon_lang
 
