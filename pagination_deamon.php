@@ -33,29 +33,61 @@ if( !class_exists('WP') ) :
 	exit();
 endif;
 
-!defined('PAGE_LANG') ? define( 'PAGE_LANG', 'pagination_deamon_lang' ) : wp_die('The constant PAGE_LANG is already defined.');
-!defined('PAGE_VERSION') ? define( 'PAGE_VERSION', 0.1.2 ) : wp_die('The constant PAGE_VERSION is already defined.');
-!defined('PAGE_PATH') ? define( 'PAGE_PATH', trailingslashit(WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__))) ) : wp_die('The constant PAGE_PATH is already defined.');
+// TEMPLATE TAG
+function get_pagination_links( $range ) {
+	new PaginationDeamon( $range );
+}
 
-	// Register styles
-	if ( !is_admin() )
-		wp_register_style( 'pagination', PAGE_PATH.'pagination.css', false, PAGE_VERSION, 'screen' );
+if ( !class_exists('PaginationDeamon') ) {
 
-	if ( !function_exists('print_pagination_styles') ) :
+class PaginationDeamon {
+	protected $range;
+
+	public function __construct( $range ) {
+		$this->range = $range;
+
+		$this->help();
+
+		$this->constants();
+
+		$this->reg_styles();
+		$this->print_styles();
+
+		$this->links( $this->range );
+	}
+
+	function constants() {
+		!defined('PAGE_LANG') ? define( 'PAGE_LANG', 'pagination_deamon_lang' ) : wp_die('The constant PAGE_LANG is already defined.');
+		!defined('PAGE_VERSION') ? define( 'PAGE_VERSION', 0.1.2 ) : wp_die('The constant PAGE_VERSION is already defined.');
+		!defined('PAGE_PATH') ? define( 'PAGE_PATH', trailingslashit(WP_PLUGIN_URL.'/'.str_replace(basename( __FILE__),"",plugin_basename(__FILE__))) ) : wp_die('The constant PAGE_PATH is already defined.');
+	}
+
+	/**
+	 * Register styles
+	 */
+	function reg_styles() {
+		if ( !is_admin() )
+			wp_register_style( 'pagination', PAGE_PATH.'pagination.css', false, PAGE_VERSION, 'screen' );
+	}
+
 	/**
 	 * Print styles
 	 */
-	function print_pagination_styles() {
+	function print_styles() {
 		if ( !is_admin() )
 			wp_print_styles('pagination');
 	}
-	endif;
 
-	// print the pagination styles outside admin UI pages
-	if ( !is_admin() )
-		print_pagination_styles();
+	/**
+	 * Help with putting the template tag in the right place
+	 */
+	function help() {
+		if ( is_singular() && !in_the_loop() )
+			echo '<div class="pagination-error"><strong>You should place the pagination template tag inside the loop on singular templates.</strong></div>';
+		if ( !is_singular() && in_the_loop() )
+			echo '<div class="pagination-error"><strong>You shouldn\'t place the pagination template tag inside the loop on list templates.</strong></div>';
+	}
 
-	if ( !function_exists('get_pagination_links') ) :
 	/**
 	 * Wordpress pagination for archives/search/etc.
 	 * 
@@ -69,28 +101,35 @@ endif;
 	 * 
 	 * @param (int) $range
 	 */
-	function get_pagination_links( $range = 5 ) {
+	function links( $range = 5 ) {
 		// $paged - number of the current page
-		global $paged, $wp_query;
+		global $paged, $wp_query;krumo($paged);
 		// How much pages do we have?
 		if ( !$max_page )
 			$max_page = $wp_query->max_num_pages;
 		// We need the pagination only if there is more than 1 page
 		if ( $max_page > 1 )
 			if ( !$paged ) $paged = 1;
-	
+
 		echo "\n".'<ul class="pagination">'."\n";
-			// On the first page, don't put the First page link
-			if ( $paged != 1 )
-				echo '<li class="page-num page-num-first"><a href='.get_pagenum_link(1).'>'.__('First', PAGE_LANG).' </a></li>'."\n";
-		
-			// To the previous page
-			echo '<li class="page-num page-num-prev">';
-				# let's use the native fn instead of the previous_/next_posts_link() alias
-				# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
-				echo get_adjacent_post( false, '', true );
-				# previous_posts_link(' &laquo; '); // «
-			echo '</li>';
+
+			// To the previous / first page
+			// On the first page, don't put the first / prev page link
+			if ( $paged != 1 ) :
+				echo '<li><a href='.get_pagenum_link(1).'>'.__('First', PAGE_LANG).' </a></li>';
+
+				echo '<li class="page-num page-num-prev">';
+					# let's use the native fn instead of the previous_/next_posts_link() alias
+					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
+					$prev_post_obj = get_adjacent_post();
+					$prev_post_ID = $prev_post_obj->ID;
+					$prev_post_link = is_singular() ? get_permalink( $prev_post_ID ) : get_bloginfo( 'url' ).'/?s='.get_search_query().'&paged='.($paged-1);
+					$prev_post_title = is_singular() ? __('Previous', PAGE_LANG).': '.$prev_post_obj->post_title : '&laquo;';
+
+					echo '<a href="'.$prev_post_link.'">'.$prev_post_title.'</a>';
+					# previous_posts_link(' &laquo; '); // «
+				echo '</li>';
+			endif;
 		
 			// We need the sliding effect only if there are more pages than is the sliding range
 			if ( $max_page > $range ) :
@@ -120,20 +159,29 @@ endif;
 					echo '<li class="page-num"><a class="paged-num-link '.$class.'" href="'.get_pagenum_link($i).'"> '.$i.' </a></li>'."\n";
 				}
 			endif;
-		
-			// Next page
-			echo '<li class="page-num page-num-next">';
-				# let's use the native fn instead of the previous_/next_posts_link() alias
-				# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
-				echo get_adjacent_post( false, '', false );
-				# next_posts_link(' &raquo; '); // »
-			echo '</li>'."\n";
-		
-			// On the last page, don't put the Last page link
-			if ( $paged != $max_page )
-				echo '<li class="page-num page-num-last"><a href='.get_pagenum_link($max_page).'> '.__('Last', PAGE_LANG).'</a></li>'."\n";
+
+			// to the last / next page
+			// On the last page, don't put the last / next page link
+			if ( $paged != $max_page ) :
+				echo '<li class="page-num page-num-next">';
+					# let's use the native fn instead of the previous_/next_posts_link() alias
+					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
+					$next_post_obj = get_adjacent_post( false, '', false );
+					$next_post_ID = $next_post_obj->ID;
+					$next_post_link = is_singular() ? get_permalink( $next_post_ID ) : get_bloginfo( 'url' ).'/?s='.get_search_query().'&paged='.($paged+1);
+					$next_post_title = is_singular() ? __('Next', PAGE_LANG).': '.$next_post_obj->post_title : '&raquo;';
+
+					echo '<a href="'.$next_post_link.'">'.$next_post_title.'</a>';
+					# next_posts_link(' &raquo; '); // »
+				echo '</li>'."\n";
+
+				echo '<li><a href='.get_pagenum_link($max_page).'> '.__('Last', PAGE_LANG).'</a></li>';
+			endif;
 	
 		echo '</ul>'."\n";
 	}
-	endif;
+
+} // END Class PaginationDeamon
+
+} // endif;
 ?>

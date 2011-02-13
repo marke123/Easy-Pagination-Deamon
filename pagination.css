@@ -1,15 +1,21 @@
+/* Error Helper */
+.pagination-error { position: absolute; top: 0px; left: 0px; color: darkred; background-color: red; border: 1px solid darkred; padding: 10px; }
 /* The List outer wrapper */
 ul.pagination {  }
-	/* A single list element, incl. first/last/prev/next/direct */
+	/* A single list element, incl. first/last/prev/next/direct/current */
 	li.page-num {  }
 		/* Specific li items: */
 		li.page-num-first {  }
 			li.page-num-first a {  }
-		li.page-num-last {  }
-			li.page-num-first a {  }
-		li.page-num-next {  }
-			li.page-num-first a {  }
 		li.page-num-prev {  }
-			li.page-num-first a {  }
+			li.page-num-prev a {  }
+		li.page-num-next {  }
+			li.page-num-next a {  }
+		li.page-num-last {  }
+			li.page-num-last a {  }
 			/* or targeting the numbers directly: */
-			.page-num-link {  }
+			li.page-num-link {  }
+				li.page-num-link a {  }
+			/* numbers active: */
+			li.page-num-link.current {  }
+				li.page-num-link.current a {  }

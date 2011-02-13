@@ -3,6 +3,8 @@ h2. Easy Pagination Deamon
 version: _v0.1.3_
 
 * Gives you an easy pagination for ex. archives, search results, blog
+* Works with every type of permalink structure
+* Uses the native get_adjacent_post() fn instead of the previous_posts_link() layer
 
 ----------------------------------------------------------------
 
