@@ -1,20 +1,20 @@
 h2. Easy Pagination Deamon
 
-version: _v0.1.3.2_
+version: _v0.1.3.3_
 
 * Gives you an easy pagination for ex. archives, search results, blog
 * Works with every type of permalink structure
 * Uses the native get_adjacent_post() fn instead of the previous_posts_link() layer
 
-(Mabye) To come within the next days: Works on single post pages too.
+(Mabye) To come within the next versions: Works on single post pages too.
 
 ----------------------------------------------------------------
 
 h3. Example
 
-When inserted it looks like the following:
-First << 1 2 3 4 5 >> Last
-_(The "first"/"last"/"<<"/">>" only get's added if you're not on the first/last page)_
+When inserted it displays like this: 
+[ First ] [ << ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ >> ] [ Last ]
+_(The [first]/[last]/[<<]/[>>] only get's added if you're not on the first/last page)_
 
 h3. How-to
 
@@ -24,9 +24,15 @@ You can specify a $range ex. get_pagination_links( 9 ); which would display
 9 links to pages, where the current one is in the middle.
 The default is "5". You should always use a not even number.
 
+h3. Stylesheets
+
+Modifying the css can be done with the provided stylesheet in the plugin folder.
+This stylesheet currently contains all classes, but no definitions (up to you).
+You can also simply copy/paste the class definitions into your themes stylesheets.
+
 h3. Languages
 
-It's prepared for a language file that translates "First" & "Last",
+It's prepared for a language file that translates "First", "Last" & the error messages,
 but so far you'd have to add that yourself.
 
 ----------------------------------------------------------------
@@ -40,3 +46,4 @@ h4. Changelog
 * _v0.1.3_ use the native get_adjacent_post() fn instead of the previous_/next_posts_link() alias
 * _v0.1.3.1_ Bugfix: get_adjacent_posts() now works without issues on object/post type list templates
 * _v0.1.3.2_ Bugfix: removed debug function call. Reworked for better readability.
+* _v0.1.3.3_ Extended documentation. Removed global constants & switched to class constants & variables.
