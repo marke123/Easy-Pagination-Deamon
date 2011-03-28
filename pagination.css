@@ -1,21 +1,67 @@
 /* Error Helper */
-.pagination-error { position: absolute; top: 0px; left: 0px; color: darkred; background-color: red; border: 1px solid darkred; padding: 10px; }
+.pagination-error { 
+	position: absolute; 
+	top: 0px; 
+	left: 0px; 
+	padding: 10px;
+	color: darkred; 
+	background-color: red; 
+	border: 1px solid darkred; 
+}
+
 /* The List outer wrapper */
-ul.pagination {  }
-	/* A single list element, incl. first/last/prev/next/direct/current */
-	li.page-num {  }
-		/* Specific li items: */
-		li.page-num-first {  }
-			li.page-num-first a {  }
-		li.page-num-prev {  }
-			li.page-num-prev a {  }
-		li.page-num-next {  }
-			li.page-num-next a {  }
-		li.page-num-last {  }
-			li.page-num-last a {  }
-			/* or targeting the numbers directly: */
-			li.page-num-link {  }
-				li.page-num-link a {  }
-			/* numbers active: */
-			li.page-num-link.current {  }
-				li.page-num-link.current a {  }
+ul.pagination {
+	  
+}
+	/* A single list element, incl. first/last/prev/next/current & pagination numbers */
+	li.pagination-num {  
+		
+	}
+
+	/* Specific li items: */
+		/* First */
+		li.pagination-first {
+			 
+		}
+			li.pagination-first a {
+				  
+			}
+
+		/* Previous */
+		li.pagination-prev {
+			  
+		}
+			li.pagination-prev a {
+				  
+			}
+
+		/* numbers */
+		li.pagination-num {
+			  
+		}
+			li.pagination-num a {
+				  
+			}
+		/* numbers - current */
+		li.pagination-num.current {
+			  
+		}
+			li.pagination-num.current a {
+				  
+			}
+
+		/* Next */
+		li.pagination-next {
+			  
+		}
+			li.pagination-num-next a {
+				  
+			}
+
+		/* Last */
+		li.pagination-last {
+			  
+		}
+			li.pagination-last a {
+				  
+			}

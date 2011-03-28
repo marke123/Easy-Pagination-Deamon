@@ -47,3 +47,4 @@ h4. Changelog
 * _v0.1.3.1_ Bugfix: get_adjacent_posts() now works without issues on object/post type list templates
 * _v0.1.3.2_ Bugfix: removed debug function call. Reworked for better readability.
 * _v0.1.3.3_ Extended documentation. Removed global constants & switched to class constants & variables.
+* _v0.1.3.4_ Switched css classes. Added white space &comments to stylesheet. 

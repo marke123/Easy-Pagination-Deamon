@@ -5,7 +5,7 @@ Plugin URI:		http://wordpress.org/extend/plugins/
 Description:	Offers the <code>get_pagination_links( $range );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.3.3
+Version:		0.1.3.4
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Text Domain:	pagination_deamon_lang
 
@@ -209,13 +209,13 @@ class PaginationDeamon
 			if ( $paged != 1 ) 
 			{
 				?>
-				<li>
+				<li class="pagination-first">
 					<a href=<?php echo get_pagenum_link( 1 ); ?>>
 						<?php _e( 'First', self::LANG ); ?>
 					</a>
 				</li>
 
-				<li class="page-num page-num-prev">
+				<li class="pagination-prev">
 					<?php 
 					# let's use the native fn instead of the previous_/next_posts_link() alias
 					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
@@ -261,9 +261,9 @@ class PaginationDeamon
 						$class = ( $i == $paged ) ? 'current' : '';
 
 						?>
-						<li class="page-num">
+						<li class="pagination-num">
 							<!-- Render page number Link -->
-							<a class="paged-num-link <?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
+							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 								<?php echo $i; ?>
 							</a>
 						</li>
@@ -279,9 +279,9 @@ class PaginationDeamon
 						$class = ( $i == $paged ) ? 'current' : '';
 
 						?>
-						<li class="page-num">
+						<li class="pagination-num">
 							<!-- Render page number Link -->
-							<a class="paged-num-link <?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
+							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 								<?php echo $i; ?>
 							</a>
 						</li>
@@ -298,9 +298,9 @@ class PaginationDeamon
 					$class = ( $i == $paged ) ? 'current' : '';
 
 					?>
-					<li class="page-num">
+					<li class="pagination-num">
 						<!-- Render page number Link -->
-						<a class="paged-num-link <?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
+						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 							<?php echo $i; ?>
 						</a>
 					</li>
@@ -316,9 +316,9 @@ class PaginationDeamon
 					$class = ( $i == $paged ) ? 'current' : '';
 
 					?>
-					<li class="page-num">
+					<li class="pagination-num">
 						<!-- Render page number Link -->
-						<a class="paged-num-link <?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
+						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 							<?php echo $i; ?>
 						</a>
 					</li>
@@ -333,7 +333,7 @@ class PaginationDeamon
 			if ( $paged != $max_page ) 
 			{
 			?>
-				<li class="page-num page-num-next">
+				<li class="pagination-next">
 			<?php 
 					# let's use the native fn instead of the previous_/next_posts_link() alias
 					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
@@ -363,7 +363,7 @@ class PaginationDeamon
 					<?php # next_posts_link(' &raquo; '); // » ?>
 				</li>
 
-				<li>
+				<li class="pagination-last">
 					<!-- Render Link to the last post -->
 					<a href=<?php echo get_pagenum_link( $max_page ); ?>>
 						<?php _e( 'Last', self::LANG ); ?>
