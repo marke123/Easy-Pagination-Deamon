@@ -5,7 +5,7 @@ Plugin URI:		http://wordpress.org/extend/plugins/
 Description:	Offers the <code>get_pagination_links( $range );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.3.4
+Version:		0.1.3.5
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Text Domain:	pagination_deamon_lang
 
@@ -27,12 +27,13 @@ Text Domain:	pagination_deamon_lang
 */
 
 // Secure: doesn't allow to load this file directly
-if( !class_exists('WP') ) 
+if( ! class_exists('WP') ) 
 {
 	header( 'Status: 403 Forbidden' );
 	header( 'HTTP/1.1 403 Forbidden' );
 	exit;
 }
+
 
 
 /**
@@ -46,15 +47,15 @@ if( !class_exists('WP') )
  */
 function get_pagination_links( $range ) 
 {
-	new PaginationDeamon( $range );
+	new oxoPagination( $range );
 }
 
 
 
-if ( !class_exists('PaginationDeamon') ) 
+if ( !class_exists('oxoPagination') ) 
 {
 
-class PaginationDeamon 
+class oxoPagination 
 {
 	protected $path;
 
@@ -377,7 +378,7 @@ class PaginationDeamon
 		<?php
 	}
 
-} // END Class PaginationDeamon
+} // END Class oxoPagination
 
 } // endif;
 ?>
