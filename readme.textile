@@ -6,17 +6,17 @@ version: _v0.1.4_
 * Works with every type of permalink structure
 * Uses the native @get_adjacent_post()@ fn instead of the @previous_posts_link()@ layer
 
-(Mabye) To come within the next versions: Works on single post pages too.
+(Mabye) To come within the next versions: Works for comments too.
 
-<hr>
+<hr />
 
-h3. Example
+h2. Example
 
 When inserted it displays like this: 
 @[ First ] [ << ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ >> ] [ Last ]@
 _(The @[first]/[last]/[<<]/[>>]@ only get's added if you're not on the first/last page)_
 
-h3. How-to
+h2. How-to
 
 Simply add @oxo_pagination()@; to your template files.
 
@@ -30,18 +30,18 @@ oxo_pagination( $args );</code>
 * You can specify an @$args['range']@ ex. @oxo_pagination( array( 'range' => 9 );@ which would display 9 links to pages, where the current one is in the middle. The default is @5@. You should always use a not even number.
 * You can also specify additional classes that get added to the @<li>@ elements. This is pretty handy if you use a css framework like blueprint. Just use @oxo_pagination( array( 'classes' => 'span-1' ) );@ to add classes.
 
-h3. Stylesheets
+h2. Stylesheets
 
 Modifying the css can be done with the provided stylesheet in the plugin folder.
 This stylesheet currently contains all classes, but no definitions (up to you).
 You can also simply copy/paste the class definitions into your themes stylesheets.
 
-h3. Languages
+h2. Languages
 
 It's prepared for a language file that translates "First", "Last" & the error messages,
 but so far you'd have to add that yourself.
 
-<hr>
+<hr />
 
 h4. Changelog
 
