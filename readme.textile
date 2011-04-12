@@ -35,9 +35,7 @@ You can also simply copy/paste the class definitions into your themes stylesheet
 
 h2. Languages
 
-It's prepared for a language file that translates "First", "Last" & the error messages,
-but so far you'd have to add that yourself.
-
+It's prepared for a language file that translates "First", "Last" & the error messages, but so far you'd have to add that yourself.
 
 h2. Changelog
 
