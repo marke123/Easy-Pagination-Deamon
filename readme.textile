@@ -21,11 +21,13 @@ h3. How-to
 Simply add @oxo_pagination()@; to your template files.
 
 Use the @$args@ array to alter the definitions:
+<style>br { display: none; }</style>
 <pre>$args = array(
 	 'range'	=> 9
 	,'classes'	=> 'additional css classes'
 );
 oxo_pagination( $args );</pre>
+<style>br { display: block; }</style>
 
 * You can specify an @$args['range']@ ex. @oxo_pagination( array( 'range' => 9 );@ which would display 9 links to pages, where the current one is in the middle. The default is @5@. You should always use a not even number.
 * You can also specify additional classes that get added to the @<li>@ elements. This is pretty handy if you use a css framework like blueprint. Just use @oxo_pagination( array( 'classes' => 'span-1' ) );@ to add classes.
