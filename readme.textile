@@ -1,6 +1,6 @@
 h1. Easy Pagination Deamon
 
-version: _v0.1.4_
+version: _v0.1.4.1_
 
 * Gives you an easy pagination for ex. archives, search results, blog
 * Works with every type of permalink structure
@@ -52,3 +52,4 @@ h2. Changelog
 * _v0.1.3.6_ Minor fixes
 * _v0.1.3.7_ Renamed template tag to @oxo_pagination()@
 * _v0.1.4_ Exchanged the @$range@ argument with an @(array) $args@ to allow additional classes for @<li>@ elements
+* _v0.1.4.1_ Updated readme & help function, also started preparation for comments pagination

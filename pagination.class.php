@@ -2,10 +2,10 @@
 /*
 Plugin Name:	Easy Pagination Deamon
 Plugin URI:		http://wordpress.org/extend/plugins/
-Description:	Offers the <code>oxo_pagination( $range );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
+Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.3.7
+Version:		0.1.4.1
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 	(c) Copyright 2010-2011 - Franz Josef Kaiser
@@ -51,7 +51,7 @@ function oxo_pagination( $args )
 
 
 
-if ( !class_exists('oxoPagination') ) 
+if ( ! class_exists('oxoPagination') ) 
 {
 
 class oxoPagination 
@@ -154,11 +154,15 @@ class oxoPagination
 	 */
 	function help() 
 	{
+		/*
+		 * Comes in a later version for comments pagination
 		if ( is_single() && ! in_the_loop() )
 		{
 			$output = sprintf( __( 'You should place the %1$s template tag inside the loop on singular templates.', self::LANG ), __CLASS__ );
 		}
-		elseif ( ! is_single() && in_the_loop() )
+		else
+		*/
+		if ( ! is_single() && in_the_loop() )
 		{
 			$output = sprintf( __( 'You shall not place the %1$s template tag inside the loop on list/archives/search/etc templates.', self::LANG ), __CLASS__ );
 		}
@@ -168,7 +172,7 @@ class oxoPagination
 
 		// error
 		$message = new WP_Error( 
-			 'oxo_loop'
+			 'oxo_pagination'
 			,$output 
 		);
 
