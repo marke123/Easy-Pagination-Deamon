@@ -8,8 +8,6 @@ version: _v0.1.4_
 
 (Mabye) To come within the next versions: Works for comments too.
 
-<hr />
-
 h2. Example
 
 When inserted it displays like this: 
@@ -41,9 +39,8 @@ h2. Languages
 It's prepared for a language file that translates "First", "Last" & the error messages,
 but so far you'd have to add that yourself.
 
-<hr />
 
-h4. Changelog
+h2. Changelog
 
 * _v0.1_ first version
 * _v0.1.1_ added a readme.textile file
