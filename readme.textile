@@ -1,4 +1,4 @@
-h2. Easy Pagination Deamon
+h1. Easy Pagination Deamon
 
 version: _v0.1.4_
 
@@ -8,7 +8,7 @@ version: _v0.1.4_
 
 (Mabye) To come within the next versions: Works on single post pages too.
 
-----------------------------------------------------------------
+<hr>
 
 h3. Example
 
@@ -41,7 +41,7 @@ h3. Languages
 It's prepared for a language file that translates "First", "Last" & the error messages,
 but so far you'd have to add that yourself.
 
-----------------------------------------------------------------
+<hr>
 
 h4. Changelog
 
