@@ -2,14 +2,13 @@
 /*
 Plugin Name:	Easy Pagination Deamon
 Plugin URI:		http://wordpress.org/extend/plugins/
-Description:	Offers the <code>get_pagination_links( $range );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
+Description:	Offers the <code>oxo_pagination( $range );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.3.5
+Version:		0.1.3.7
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-Text Domain:	pagination_deamon_lang
 
-	(c) Copyright 20010-2011 - Franz Josef Kaiser
+	(c) Copyright 2010-2011 - Franz Josef Kaiser
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -45,9 +44,9 @@ if( ! class_exists('WP') )
  * 
  * @param integer $range
  */
-function get_pagination_links( $range ) 
+function oxo_pagination( $args ) 
 {
-	new oxoPagination( $range );
+	return new oxoPagination( $args );
 }
 
 
@@ -57,15 +56,23 @@ if ( !class_exists('oxoPagination') )
 
 class oxoPagination 
 {
+	/**
+	 * Plugin root path
+	 * @var unknown_type
+	 */
 	protected $path;
 
+	/**
+	 * Plugin version
+	 * @var integer
+	 */
 	protected $version;
 
 	/**
 	 * Range
 	 * @var integer
 	 */
-	protected $range;
+	protected $args;
 
 	/**
 	 * Constant for the texdomain (i18n)
@@ -73,16 +80,16 @@ class oxoPagination
 	const LANG = 'pagination_textdomain';
 
 
-	public function __construct( $range ) 
+	public function __construct( $args ) 
 	{
 		// Set root path variable
 		$this->path = $this->get_root_path();
 
 		// Set version
-		$this->version = get_plugin_data();
+		# $this->version = get_plugin_data();
 
 		// Set displayed range of page nav links taken from the input set at the template tag.
-		$this->range = $range;
+		$this->args = $args;
 
 		// Help placing the template tag at the right position (inside/outside loop).
 		$this->help();
@@ -93,7 +100,7 @@ class oxoPagination
 		add_action( 'wp_head', array( &$this, 'print_styles' ) );
 
 		// render
-		$this->render( $this->range );
+		$this->render( $this->args );
 	}
 
 	/**
@@ -125,9 +132,9 @@ class oxoPagination
 	 */
 	function register_styles() 
 	{
-		if ( ! is_admin() )
+		if ( ! is_admin() && file_exists( $this->path.'pagination.css' ) )
 		{
-			wp_register_style( 'pagination', $this->path.'pagination.css', false, self::VERSION, 'screen' );
+			wp_register_style( 'pagination', $this->path.'pagination.css', false, $this->version, 'screen' );
 		}
 	}
 
@@ -149,17 +156,30 @@ class oxoPagination
 	{
 		if ( is_single() && ! in_the_loop() )
 		{
-		?>
-			<div class="pagination-error">
-				<strong><?php _e( 'You should place the pagination template tag inside the loop on singular templates.', self::LANG ); ?></strong>
-			</div>
-		<?php	
+			$output = sprintf( __( 'You should place the %1$s template tag inside the loop on singular templates.', self::LANG ), __CLASS__ );
 		}
-		if ( ! is_single() && in_the_loop() )
+		elseif ( ! is_single() && in_the_loop() )
 		{
+			$output = sprintf( __( 'You shall not place the %1$s template tag inside the loop on list/archives/search/etc templates.', self::LANG ), __CLASS__ );
+		}
+
+		if ( ! isset( $output ) )
+			return;
+
+		// error
+		$message = new WP_Error( 
+			 'oxo_loop'
+			,$output 
+		);
+
+		// render
+		if ( is_wp_error( $message ) ) 
+		{ 
 		?>
-			<div class="pagination-error">
-				<strong><?php _e( 'You shall not place the pagination template tag inside the loop on list/archives/search/etc templates.', self::LANG ); ?></strong>
+			<div id="oxo-error-<?php echo $message->get_error_code(); ?>" class="error oxo-error prepend-top left">
+				<strong>
+					<?php echo $message->get_error_message(); ?>
+				</strong>
 			</div>
 		<?php 
 		}
@@ -179,16 +199,16 @@ class oxoPagination
 	 * 
 	 * @param (integer) $range
 	 */
-	function render( $range = 5 ) 
+	function render( $args = array( 'classes', 'range' ) ) 
 	{
 		// $paged - number of the current page
 		global $paged, $wp_query;
 
 		// How much pages do we have?
-		if ( ! $max_page )
-		{
+		# if ( ! $max_page )
+		# {
 			$max_page = $wp_query->max_num_pages;
-		}
+		# }
 
 		// We need the pagination only if there is more than 1 page
 		if ( $max_page > 1 )
@@ -199,10 +219,15 @@ class oxoPagination
 			}
 		}
 
-		?>
-		<ul class="pagination">
-		<?php 
+		// if a class argument was set, prepend an empty space
+		$classes	= isset ( $args['classes'] ) ? ' '.$args['classes'] : '';
 
+		$range		= isset ( $args['range'] ) ? $args['range'] : 5;
+		?>
+
+		<ul class="pagination">
+
+			<?php 
 			// *******************************************************
 			// To the previous / first page
 			// On the first page, don't put the first / prev page link
@@ -210,13 +235,13 @@ class oxoPagination
 			if ( $paged != 1 ) 
 			{
 				?>
-				<li class="pagination-first">
+				<li class="pagination-first<?php echo $classes; ?>">
 					<a href=<?php echo get_pagenum_link( 1 ); ?>>
 						<?php _e( 'First', self::LANG ); ?>
 					</a>
 				</li>
 
-				<li class="pagination-prev">
+				<li class="pagination-prev<?php echo $classes; ?>">
 					<?php 
 					# let's use the native fn instead of the previous_/next_posts_link() alias
 					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
@@ -224,7 +249,7 @@ class oxoPagination
 					// Get the previous post object
 					$prev_post_obj	= get_adjacent_post();
 					// Get the previous posts ID
-					$prev_post_ID	= $next_post_obj->ID;
+					$prev_post_ID	= isset( $prev_post_obj->ID ) ? $prev_post_obj->ID : '';
 
 					// Set title & link for the previous post
 					if ( is_single() )
@@ -256,13 +281,13 @@ class oxoPagination
 				// When closer to the beginning
 				if ( $paged < $range ) 
 				{
-					for ( $i = 1; $i <= ( $range + 1 ); $i++ ) 
+					for ( $i = 1; $i <= ( $range+1 ); $i++ ) 
 					{
 						// Apply the css class "current" if it's the current post
-						$class = ( $i == $paged ) ? 'current' : '';
+						$class = ( $paged == $i ) ? 'current' : '';
 
 						?>
-						<li class="pagination-num">
+						<li class="pagination-num<?php echo $classes; ?>">
 							<!-- Render page number Link -->
 							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 								<?php echo $i; ?>
@@ -280,7 +305,7 @@ class oxoPagination
 						$class = ( $i == $paged ) ? 'current' : '';
 
 						?>
-						<li class="pagination-num">
+						<li class="pagination-num<?php echo $classes; ?>">
 							<!-- Render page number Link -->
 							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 								<?php echo $i; ?>
@@ -299,7 +324,7 @@ class oxoPagination
 					$class = ( $i == $paged ) ? 'current' : '';
 
 					?>
-					<li class="pagination-num">
+					<li class="pagination-num<?php echo $classes; ?>">
 						<!-- Render page number Link -->
 						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 							<?php echo $i; ?>
@@ -317,7 +342,7 @@ class oxoPagination
 					$class = ( $i == $paged ) ? 'current' : '';
 
 					?>
-					<li class="pagination-num">
+					<li class="pagination-num<?php echo $classes; ?>">
 						<!-- Render page number Link -->
 						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
 							<?php echo $i; ?>
@@ -334,8 +359,8 @@ class oxoPagination
 			if ( $paged != $max_page ) 
 			{
 			?>
-				<li class="pagination-next">
-			<?php 
+				<li class="pagination-next<?php echo $classes; ?>">
+					<?php 
 					# let's use the native fn instead of the previous_/next_posts_link() alias
 					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
 
@@ -364,7 +389,7 @@ class oxoPagination
 					<?php # next_posts_link(' &raquo; '); // » ?>
 				</li>
 
-				<li class="pagination-last">
+				<li class="pagination-last<?php echo $classes; ?>">
 					<!-- Render Link to the last post -->
 					<a href=<?php echo get_pagenum_link( $max_page ); ?>>
 						<?php _e( 'Last', self::LANG ); ?>
