@@ -4,7 +4,7 @@ version: _v0.1.4_
 
 * Gives you an easy pagination for ex. archives, search results, blog
 * Works with every type of permalink structure
-* Uses the native get_adjacent_post() fn instead of the previous_posts_link() layer
+* Uses the native @get_adjacent_post()@ fn instead of the @previous_posts_link()@ layer
 
 (Mabye) To come within the next versions: Works on single post pages too.
 
@@ -13,15 +13,24 @@ version: _v0.1.4_
 h3. Example
 
 When inserted it displays like this: 
-[ First ] [ << ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ >> ] [ Last ]
-_(The [first]/[last]/[<<]/[>>] only get's added if you're not on the first/last page)_
+@[ First ] [ << ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ >> ] [ Last ]@
+_(The @[first]/[last]/[<<]/[>>]@ only get's added if you're not on the first/last page)_
 
 h3. How-to
 
-Simply add `oxo_pagination()`; to your template files.
+Simply add @oxo_pagination()@; to your template files.
 
-* You can specify an `$args['range'] ex. `oxo_pagination( array( 'range' => 9 ); which would display 9 links to pages, where the current one is in the middle. The default is "5". You should always use a not even number.
-* You can also specify additional classes that get added to the `<li>` elements. This is pretty handy if you use a css framework like blueprint. Just use `oxo_pagination( array( 'classes' => 'span-1' ) );` to add classes.
+Use the @$args@ array to alter the definitions:
+<pre>
+	$args = array(
+		 'range'	=> 9
+		,'classes'	=> 'additional css classes'
+	);
+	oxo_pagination( $args );
+</pre>
+
+* You can specify an @$args['range']@ ex. @oxo_pagination( array( 'range' => 9 );@ which would display 9 links to pages, where the current one is in the middle. The default is @5@. You should always use a not even number.
+* You can also specify additional classes that get added to the @<li>@ elements. This is pretty handy if you use a css framework like blueprint. Just use @oxo_pagination( array( 'classes' => 'span-1' ) );@ to add classes.
 
 h3. Stylesheets
 
@@ -42,12 +51,12 @@ h4. Changelog
 * _v0.1.1_ added a readme.textile file
 * _v0.1.2_ renamed the template tag
 * _v0.1.2.1_ minor
-* _v0.1.3_ use the native `get_adjacent_post()` fn instead of the previous_/next_posts_link() alias
-* _v0.1.3.1_ Bugfix: `get_adjacent_posts()` now works without issues on object/post type list templates
+* _v0.1.3_ use the native @get_adjacent_post()@ fn instead of the @previous_posts_link()@ & @next_posts_link()@ alias
+* _v0.1.3.1_ Bugfix: @get_adjacent_posts()@ now works without issues on object/post type list templates
 * _v0.1.3.2_ Bugfix: removed debug function call. Reworked for better readability.
 * _v0.1.3.3_ Extended documentation. Removed global constants & switched to class constants & variables.
-* _v0.1.3.4_ Switched css classes. Added white space &comments to stylesheet. 
+* _v0.1.3.4_ Switched css classes. Added white space & comments to stylesheet. 
 * _v0.1.3.5_ Renamed class & file.
 * _v0.1.3.6_ Minor fixes
-* _v0.1.3.7_ Renamed template tag to 'oxo_pagination'
-* _v0.1.4_ Exchanged the `$range` argument with an array of `$args` to allow additional classes for `<li>` elements
+* _v0.1.3.7_ Renamed template tag to @oxo_pagination()@
+* _v0.1.4_ Exchanged the @$range@ argument with an @(array) $args@ to allow additional classes for @<li>@ elements
