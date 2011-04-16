@@ -5,7 +5,7 @@ Plugin URI:		http://wordpress.org/extend/plugins/
 Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.4.1
+Version:		0.1.4.2
 License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 	(c) Copyright 2010-2011 - Franz Josef Kaiser
@@ -155,7 +155,6 @@ class oxoPagination
 	function help() 
 	{
 		/*
-		 * Comes in a later version for comments pagination
 		if ( is_single() && ! in_the_loop() )
 		{
 			$output = sprintf( __( 'You should place the %1$s template tag inside the loop on singular templates.', self::LANG ), __CLASS__ );
@@ -172,7 +171,7 @@ class oxoPagination
 
 		// error
 		$message = new WP_Error( 
-			 'oxo_pagination'
+			 __CLASS__
 			,$output 
 		);
 
@@ -180,7 +179,7 @@ class oxoPagination
 		if ( is_wp_error( $message ) ) 
 		{ 
 		?>
-			<div id="oxo-error-<?php echo $message->get_error_code(); ?>" class="error oxo-error prepend-top left">
+			<div id="oxo-error-<?php echo $message->get_error_code(); ?>" class="error oxo-error prepend-top clear">
 				<strong>
 					<?php echo $message->get_error_message(); ?>
 				</strong>
@@ -226,6 +225,7 @@ class oxoPagination
 		// if a class argument was set, prepend an empty space
 		$classes	= isset ( $args['classes'] ) ? ' '.$args['classes'] : '';
 
+		// if no range was specified, we set a default of 5
 		$range		= isset ( $args['range'] ) ? $args['range'] : 5;
 		?>
 
@@ -258,21 +258,29 @@ class oxoPagination
 					// Set title & link for the previous post
 					if ( is_single() )
 					{
-						$prev_post_link		= get_permalink( $prev_post_ID );
-						$prev_post_title	= __( 'Next', self::LANG ).': '.$next_post_obj->post_title;
+						if ( isset( $prev_post_obj ) )
+						{
+							$prev_post_link		= get_permalink( $prev_post_ID );
+							$prev_post_title	= __( 'Next', self::LANG ).': '.$prev_post_obj->post_title;
+						}
 					}
 					else 
 					{
 						$prev_post_link		= get_bloginfo( 'url' ).'/?s='.get_search_query().'&paged='.( $paged-1 );
-						$prev_post_title	= '&raquo;'; // equals "»"
+						$prev_post_title	= '&laquo;'; // equals "»"
 					}
 
+					if ( isset( $prev_post_obj ) )
+					{
+						?>
+						<!-- Render Link to the previous post -->
+						<a href="<?php echo $prev_post_link; ?>">
+							<?php echo $prev_post_title; ?>
+						</a>
+						<?php
+						# previous_posts_link(' &laquo; '); // « 
+					} 
 					?>
-					<!-- Render Link to the previous post -->
-					<a href="<?php echo $prev_post_link; ?>">
-						<?php echo $prev_post_title; ?>
-					</a>
-					<?php # previous_posts_link(' &laquo; '); // « ?>
 				</li>
 				<?php 
 			}
@@ -376,8 +384,11 @@ class oxoPagination
 					// Set title & link for the next post
 					if ( is_single() )
 					{
-						$next_post_link		= get_permalink( $next_post_ID );
-						$next_post_title	= __( 'Next', self::LANG ).': '.$next_post_obj->post_title;
+						if ( isset( $next_post_obj ) )
+						{
+							$next_post_link		= get_permalink( $next_post_ID );
+							$next_post_title	= __( 'Next', self::LANG ).': '.$next_post_obj->post_title;
+						}
 					}
 					else 
 					{
@@ -385,12 +396,17 @@ class oxoPagination
 						$next_post_title	= '&raquo;'; // equals "»"
 					}
 
+					if ( isset ( $next_post_obj ) )
+					{
+						?>
+						<!-- Render Link to the next post -->
+						<a href="<?php echo $next_post_link; ?>">
+							<?php echo $next_post_title; ?>
+						</a>
+						<?php
+						# next_posts_link(' &raquo; '); // » 
+					} 
 					?>
-					<!-- Render Link to the next post -->
-					<a href="<?php echo $next_post_link; ?>">
-						<?php echo $next_post_title; ?>
-					</a>
-					<?php # next_posts_link(' &raquo; '); // » ?>
 				</li>
 
 				<li class="pagination-last<?php echo $classes; ?>">
