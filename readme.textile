@@ -1,12 +1,14 @@
 h1. Easy Pagination Deamon
 
-version: _v0.1.4.2_
+version: _v0.1.4.3_
 
 * Gives you an easy pagination for ex. archives, search results, blog
 * Works with every type of permalink structure
 * Uses the native @get_adjacent_post()@ fn instead of the @previous_posts_link()@ layer
 
 (Mabye) To come within the next versions: Works for comments too.
+
+License: extended MIT/Expat
 
 h2. Example
 
@@ -54,3 +56,4 @@ h2. Changelog
 * _v0.1.4_ Exchanged the @$range@ argument with an @(array) $args@ to allow additional classes for @<li>@ elements
 * _v0.1.4.1_ Updated readme & help function, also started preparation for comments pagination
 * _v0.1.4.2_ Bugfix: previous instead of next post object for previous posts link
+* _v0.1.4.3_ Allow alternate stylesheet locations: child, parent theme

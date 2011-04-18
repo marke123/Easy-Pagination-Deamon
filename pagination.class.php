@@ -2,27 +2,14 @@
 /*
 Plugin Name:	Easy Pagination Deamon
 Plugin URI:		http://wordpress.org/extend/plugins/
-Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a semantically correct, seo-ready (well performing) pagination.
+Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a semantically correct, 
+				seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
 Version:		0.1.4.2
-License:		GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+License:		extended MIT/Expat license
 
-	(c) Copyright 2010-2011 - Franz Josef Kaiser
-
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+(c) Copyright 2010-2011 - Franz Josef Kaiser
 */
 
 // Secure: doesn't allow to load this file directly
@@ -88,6 +75,18 @@ class oxoPagination
 		// Set version
 		# $this->version = get_plugin_data();
 
+		// $args
+		$defaults = array( 
+			 'classes'	=> ''
+			,'range'	=> 5
+		);
+		// filter defaults
+		$defaults = apply_filters( 'pagination_defaults', $defaults ); 
+	
+		// merge defaults with input arguments
+		$args = wp_parse_args( $args, $defaults );
+		extract( $args, EXTR_SKIP );
+
 		// Set displayed range of page nav links taken from the input set at the template tag.
 		$this->args = $args;
 
@@ -132,9 +131,34 @@ class oxoPagination
 	 */
 	function register_styles() 
 	{
-		if ( ! is_admin() && file_exists( $this->path.'pagination.css' ) )
+		if ( ! is_admin() )
 		{
-			wp_register_style( 'pagination', $this->path.'pagination.css', false, $this->version, 'screen' );
+			// Search for a stylesheet
+			$name = 'pagination.css';
+			if ( file_exists( STYLESHEETPATH.$name ) )
+			{
+				$file = STYLESHEETPATH.$name;
+			}
+			elseif ( file_exists( TEMPLATEPATH.$name ) )
+			{
+				$file = TEMPLATEPATH.$name;
+			}
+			elseif ( file_exists( $this->path.$name ) )
+			{
+				$file = $this->path.$name;
+			}
+			else 
+			{
+				return;
+			}
+
+			// try to avoid caching stylesheets if they changed
+			$version = filemtime( $file );
+			// If no change was found, use the plugins version number
+			if ( ! $version )
+				$version = $this->version;
+
+			wp_register_style( 'pagination', $file, false, $version, 'screen' );
 		}
 	}
 
