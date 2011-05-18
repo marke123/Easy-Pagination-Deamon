@@ -6,7 +6,7 @@ Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a
 				seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.3.
+Version:		0.4.
 License:		extended MIT/Expat license
 
 (c) Copyright 2010-2011 - Franz Josef Kaiser
@@ -60,8 +60,8 @@ class oxoPagination
 	 * @var array
 	 */
 	protected $defaults = array( 
-		 'classes'	=> ''
-		,'range'	=> 5
+		 'classes'			=> ''
+		,'range'			=> 5
 		,'wrapper'			=> 'li' // element in which we wrap the link 
 		,'highlight'		=> 'current' // class for the current page
 		,'before'			=> ''
@@ -72,6 +72,9 @@ class oxoPagination
 		,'nextpagelink'		=> 'Next'
 		,'previouspagelink'	=> 'Prev'
 		,'pagelink'			=> '%'
+		# only for attachment img pagination/navigation
+		,'attachment_size'	=> 'thumbnail'
+		,'show_attachment'	=> true
 	);
 
 	/**
@@ -252,12 +255,14 @@ class oxoPagination
 		if ( ! $multipage )
 			return;
 
-		# >>>> css classes
+		# ============================================== #
+
+		# >>>> css classes wrapper
 		$start_classes = isset( $classes ) ? ' class="' : '';
 		$end_classes = isset( $classes ) ? '"' : '';
-		# <<<< css classes
+		# <<<< css classes wrapper
 
-		$output = $before;
+		$output  = $before;
 		switch ( $next_or_number ) 
 		{
 			case 'next' :
@@ -331,6 +336,95 @@ class oxoPagination
 
 
 	/**
+	 * Navigation for image attachments
+	 * 
+	 * @param unknown_type $args
+	 */
+	public function attachment_links( $args )
+	{
+		global $post, $page;
+
+		$args = wp_parse_args( $args, $this->defaults );
+		extract( $args, EXTR_SKIP );
+
+		# ============================================== #
+
+		$attachments = array_values( get_children( array( 
+			 'post_parent'		=> $post->post_parent
+			,'post_status'		=> 'inherit'
+			,'post_type'		=> 'attachment'
+			,'post_mime_type'	=> 'image'
+			,'order'			=> 'ASC'
+			,'orderby'			=> 'menu_order ID' 
+		) ) );
+
+		// setup the keys for our links
+		foreach ( $attachments as $key => $attachment ) {
+			if ( $attachment->ID == $post->ID )
+				break;
+		}
+
+		# ============================================== #
+		# @todo implement rel="next/prev" for links
+
+		# >>>> css classes wrapper
+		$start_classes = isset( $classes ) ? ' class="' : '';
+			$classes = isset( $classes ) ? ' '.$classes : '';
+		$end_classes = isset( $classes ) ? '"' : '';
+		# <<<< css classes wrapper
+
+		$output  = $before;
+			# >>>> [prev]
+			if ( isset( $attachments[ $key - 1 ] ) )
+			{
+				$prev_href = get_attachment_link( $attachments[ $key - 1 ]->ID );
+
+				$prev_title = str_replace( "_", " ", $attachments[ $key - 1 ]->post_title );
+				$prev_title = str_replace( "-", " ", $prev_title );
+
+				if ( $show_attachment === true )
+				{
+					if ( ( is_int( $attachment_size ) && $attachment_size != 0 ) || ( is_string( $attachment_size ) && $attachment_size != 'none' ) || $attachment_size != false )
+						$prev_img = wp_get_attachment_image( $attachments[ $key - 1 ]->ID, $attachment_size, false );
+				}
+
+				# >>>> <li class="custom-class">
+				$output .= '<'.$wrapper. $start_classes.$classes.$end_classes .'>';
+					$output .= $link_before.'<a href="'.$prev_href.'" title="'.esc_attr( $prev_title ).'" rel="attachment prev">'.$prev_img.$previouspagelink.'</a>'.$link_after;
+				$output .= '</'.$wrapper.'>';
+				# <<<< </li>
+			}
+			# <<<< [prev]
+
+			# >>>> [next]
+			if ( isset( $attachments[ $key + 1 ] ) )
+			{
+				$next_href = get_attachment_link( $attachments[ $key + 1 ]->ID );
+
+				$next_title = str_replace( "_", " ", $attachments[ $key + 1 ]->post_title );
+				$next_title = str_replace( "-", " ", $next_title );
+
+				if ( $show_attachment === true )
+				{
+					if ( ( is_int( $attachment_size ) && $attachment_size != 0 ) || ( is_string( $attachment_size ) && $attachment_size != 'none' ) || $attachment_size != false )
+						$next_img = wp_get_attachment_image( $attachments[ $key + 1 ]->ID, $attachment_size, false );
+				}
+
+				# >>>> <li class="custom-class">
+				$output .= '<'.$wrapper. $start_classes.$classes.$end_classes .'>';
+					$output .= $link_before.'<a href="'.$next_href.'" title="'.esc_attr( $next_title ).'" rel="attachment prev">'.$next_img.$nextpagelink.'</a>'.$link_after;
+				$output .= '</'.$wrapper.'>';
+				# <<<< </li>
+			}
+			# <<<< [next]
+		$output .= $after;
+
+		#echo '<pre>';print_r($k);echo '</pre>';
+		return $output;
+	}
+
+
+	/**
 	 * Wordpress pagination for archives/search/etc.
 	 * 
 	 * Semantically correct pagination inside an unordered list
@@ -351,7 +445,7 @@ class oxoPagination
 
 		extract( $args, EXTR_SKIP );
 
-		# ============================================================== #
+		# ============================================== #
 
 		// How much pages do we have?
 		$max_page = (int) $wp_query->max_num_pages;
@@ -514,10 +608,18 @@ class oxoPagination
 			// to the last / next page of a paged post
 			// This only get's used on posts/pages that use the <!--nextpage--> quicktag
 			// *******************************************************
-			if ( is_singular() && $numpages > 1 )
+			if ( is_singular() )
 			{
 				$echo = false;
-				echo $this->page_links( $this->args );
+
+				if ( wp_attachment_is_image() === true )
+				{ 
+					echo $this->attachment_links( $this->args );
+				}
+				elseif ( $numpages > 1 )
+				{
+					echo $this->page_links( $this->args );
+				}
 			}
 
 

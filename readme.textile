@@ -1,6 +1,6 @@
 h1. Easy Pagination Deamon
 
-version: _v0.3._
+version: _v0.4._
 
 * Gives you an easy pagination for ex. archives, search results, blog, paginated posts/pages
 * Works with every type of permalink structure
@@ -12,12 +12,14 @@ h2. Features
 
 h3. Todo: 
 
-Works for comments too.
+Make available for comments too.
 Make all arguments available for both paginated posts/pages and archive templates.
+Allow next/prev first/last on paginated posts/pages too.
 
 h3. Done:
 
-Works on paginated posts/pages
+Works on paginated posts/pages.
+Works for image attachment pages (gallery).
 
 h2. Example
 
@@ -56,6 +58,9 @@ $defaults = array(
 	,'nextpagelink'		=> 'Next'
 	,'previouspagelink'	=> 'Prev'
 	,'pagelink'			=> '%'
+	# only for image attachment pages
+	,'attachment_size'	=> 'thumbnail'
+	,'show_attachment'	=> true
 );
 </pre>
 
@@ -88,3 +93,4 @@ h2. Changelog
 * _v0.1.4.2_ Bugfix: previous instead of next post object for previous posts link
 * _v0.1.4.3_ Allow alternate stylesheet locations: child, parent theme
 * _v0.3._ Major release: You can now use it for paginated archives/home templates as well as paginated posts/pages.
+* _v0.4._ Major release: You can now use it for image attachment templates (gallery) as well.
