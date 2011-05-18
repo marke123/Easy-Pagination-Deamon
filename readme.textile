@@ -11,10 +11,12 @@ License: extended MIT/Expat
 h2. Features
 
 h3. Todo: 
+
 Works for comments too.
 Make all arguments available for both paginated posts/pages and archive templates.
 
 h3. Done:
+
 Works on paginated posts/pages
 
 h2. Example
