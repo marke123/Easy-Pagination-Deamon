@@ -57,7 +57,7 @@ $defaults = array(
 	,'previouspagelink'	=> 'Prev'
 	,'pagelink'			=> '%'
 );
-</pre
+</pre>
 
 h2. Stylesheets
 
