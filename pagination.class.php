@@ -6,7 +6,7 @@ Description:	Offers the <code>oxo_pagination( $args );</code> template tag for a
 				seo-ready (well performing) pagination.
 Author:			Franz Josef Kaiser
 Author URI: 	http://say-hello-code.com
-Version:		0.1.4.2
+Version:		0.3.
 License:		extended MIT/Expat license
 
 (c) Copyright 2010-2011 - Franz Josef Kaiser
@@ -56,8 +56,27 @@ class oxoPagination
 	protected $version;
 
 	/**
-	 * Range
-	 * @var integer
+	 * Default arguments
+	 * @var array
+	 */
+	protected $defaults = array( 
+		 'classes'	=> ''
+		,'range'	=> 5
+		,'wrapper'			=> 'li' // element in which we wrap the link 
+		,'highlight'		=> 'current' // class for the current page
+		,'before'			=> ''
+		,'after'			=> ''
+		,'link_before'		=> ''
+		,'link_after'		=> ''
+		,'next_or_number'	=> 'number'
+		,'nextpagelink'		=> 'Next'
+		,'previouspagelink'	=> 'Prev'
+		,'pagelink'			=> '%'
+	);
+
+	/**
+	 * Input arguments
+	 * @var array
 	 */
 	protected $args;
 
@@ -75,20 +94,15 @@ class oxoPagination
 		// Set version
 		# $this->version = get_plugin_data();
 
-		// $args
-		$defaults = array( 
-			 'classes'	=> ''
-			,'range'	=> 5
-		);
-		// filter defaults
-		$defaults = apply_filters( 'pagination_defaults', $defaults ); 
-	
-		// merge defaults with input arguments
-		$args = wp_parse_args( $args, $defaults );
-		extract( $args, EXTR_SKIP );
+		# >>>> defaults & arguments
 
-		// Set displayed range of page nav links taken from the input set at the template tag.
-		$this->args = $args;
+			// apply the "wp_list_pages_args" wordpress native filter also to the custom "page_links" function.
+			$this->defaults = apply_filters( 'wp_link_pages_args', $this->defaults );
+
+			// merge defaults with input arguments
+			$this->args = wp_parse_args( $args, $this->defaults );
+
+		# <<<< defaults & arguments
 
 		// Help placing the template tag at the right position (inside/outside loop).
 		$this->help();
@@ -98,17 +112,22 @@ class oxoPagination
 		// Load stylesheet into the 'wp_head()' hook of your theme.
 		add_action( 'wp_head', array( &$this, 'print_styles' ) );
 
-		// render
+		// RENDER
 		$this->render( $this->args );
 	}
+
 
 	/**
 	 * Plugin root
 	 */
 	function get_root_path() 
 	{
-		return $this->path = trailingslashit( WP_PLUGIN_URL.'/'.str_replace( basename( __FILE__), "", plugin_basename( __FILE__ ) ) );
+		$path = trailingslashit( WP_PLUGIN_URL.'/'.str_replace( basename( __FILE__ ), "", plugin_basename( __FILE__ ) ) );
+		$path = apply_filters( 'config_pagination_url', $path );
+
+		return $this->path = $path;
 	}
+
 
 	/**
 	 * Return plugin comment data
@@ -184,6 +203,8 @@ class oxoPagination
 			$output = sprintf( __( 'You should place the %1$s template tag inside the loop on singular templates.', self::LANG ), __CLASS__ );
 		}
 		else
+
+		_doing_it_wrong( 'Class: '.__CLASS__.' function: '.__FUNCTION__, 'error message' );
 		*/
 		if ( ! is_single() && in_the_loop() )
 		{
@@ -212,6 +233,103 @@ class oxoPagination
 		}
 	}
 
+
+	/**
+	 * Replacement for the native wp_link_page() function
+	 * 
+	 * @author original version: Thomas Scholz (toscho.de)
+	 * @link http://wordpress.stackexchange.com/questions/14406/how-to-style-current-page-number-wp-link-pages/14460#14460
+	 * 
+	 * @param (mixed) array $args
+	 */
+	public function page_links( $args )
+	{
+		global $page, $numpages, $multipage, $more, $pagenow;
+
+		$args = wp_parse_args( $args, $this->defaults );
+		extract( $args, EXTR_SKIP );
+
+		if ( ! $multipage )
+			return;
+
+		# >>>> css classes
+		$start_classes = isset( $classes ) ? ' class="' : '';
+		$end_classes = isset( $classes ) ? '"' : '';
+		# <<<< css classes
+
+		$output = $before;
+		switch ( $next_or_number ) 
+		{
+			case 'next' :
+				if ( $more ) 
+				{
+					# >>>> [prev]
+					$i = $page - 1;
+					if ( $i && $more ) 
+					{
+						# >>>> <li class="custom-class">
+						$output .= '<'.$wrapper.$start_classes.$classes.$end_classes.'>';
+							$output .= _wp_link_page( $i ).$link_before.$previouspagelink.$link_after.'</a>';
+						$output .= '</'.$wrapper.'>';
+						# <<<< </li>
+					}
+					# <<<< [prev]
+
+					# >>>> [next]
+					$i = $page + 1;
+					if ( $i <= $numpages && $more ) 
+					{
+						# >>>> <li class="custom-class">
+						$output .= '<'.$wrapper.$start_classes.$classes.$end_classes.'>';
+							$output .= _wp_link_page( $i ).$link_before.$nextpagelink.$link_after.'</a>';
+						$output .= '</'.$wrapper.'>';
+						# <<<< </li>
+					}
+					# <<<< [next]
+				}
+				break;
+
+			case 'number' :
+				for ( $i = 1; $i < ( $numpages + 1 ); $i++ )
+				{
+					$classes = isset( $this->args['classes'] ) ? $this->args['classes'] : '';
+					if ( $page === $i && isset( $this->args['highlight'] ) )
+						 $classes .= ' '.$this->args['highlight'];
+
+					# >>>> <li class="current custom-class">
+					$output .= '<'.$wrapper.$start_classes.$classes.$end_classes.'>';
+
+						# >>>> [1] [2] [3] [4]
+						$j = str_replace( '%', $i, $pagelink );
+
+						if ( $page !== $i || ( ! $more && $page == true ) )
+						{
+							$output .= _wp_link_page( $i ).$link_before.$j.$link_after.'</a>';
+						}
+
+						// the current page must not have a link to itself
+						else
+						{
+							$output .= $link_before.'<span>'.$j.'</span>'.$link_after;
+						}
+						# <<<< [next]/[prev] | [1] [2] [3] [4]
+
+					$output .= '</'.$wrapper.'>';
+					# <<<< </li>
+				}
+				break;
+
+			default :
+				// in case you can imagine some funky way to paginate
+				do_action( 'hook_pagination_next_or_number', $page_links, $classes );
+				break;
+		}
+		$output .= $after;
+
+		return $output;
+	}
+
+
 	/**
 	 * Wordpress pagination for archives/search/etc.
 	 * 
@@ -229,194 +347,213 @@ class oxoPagination
 	function render( $args = array( 'classes', 'range' ) ) 
 	{
 		// $paged - number of the current page
-		global $paged, $wp_query;
+		global $wp_query, $paged, $numpages;
+
+		extract( $args, EXTR_SKIP );
+
+		# ============================================================== #
 
 		// How much pages do we have?
-		# if ( ! $max_page )
-		# {
-			$max_page = $wp_query->max_num_pages;
-		# }
+		$max_page = (int) $wp_query->max_num_pages;
 
 		// We need the pagination only if there is more than 1 page
-		if ( $max_page > 1 )
-		{
-			if ( ! $paged )
-			{ 
-				$paged = 1;
-			}
-		}
+		if ( $max_page > (int) 1 )
+			$paged = ! $wp_query->query_vars['paged'] ? (int) 1 : $wp_query->query_vars['paged'];
 
-		// if a class argument was set, prepend an empty space
-		$classes	= isset ( $args['classes'] ) ? ' '.$args['classes'] : '';
-
-		// if no range was specified, we set a default of 5
-		$range		= isset ( $args['range'] ) ? $args['range'] : 5;
+		$classes = isset( $classes ) ? ' '.$classes : '';
 		?>
 
 		<ul class="pagination">
 
 			<?php 
 			// *******************************************************
-			// To the previous / first page
+			// To the first / previous page
 			// On the first page, don't put the first / prev page link
 			// *******************************************************
-			if ( $paged != 1 ) 
+			if ( $paged !== (int) 1 && $paged !== (int) 0 && ! is_page() ) 
 			{
 				?>
-				<li class="pagination-first<?php echo $classes; ?>">
-					<a href=<?php echo get_pagenum_link( 1 ); ?>>
+				<li class="pagination-first <?php echo $classes; ?>">
+					<?php
+					$first_post_link = get_pagenum_link( 1 ); 
+					?>
+					<a href=<?php echo $first_post_link; ?> rel="first">
 						<?php _e( 'First', self::LANG ); ?>
 					</a>
 				</li>
 
-				<li class="pagination-prev<?php echo $classes; ?>">
+				<li class="pagination-prev <?php echo $classes; ?>">
 					<?php 
-					# let's use the native fn instead of the previous_/next_posts_link() alias
-					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
+						# let's use the native fn instead of the previous_/next_posts_link() alias
+						# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
 
-					// Get the previous post object
-					$prev_post_obj	= get_adjacent_post();
-					// Get the previous posts ID
-					$prev_post_ID	= isset( $prev_post_obj->ID ) ? $prev_post_obj->ID : '';
+						// Get the previous post object
+						$in_same_cat	= is_category() || is_tag() || is_tax() ? true : false;
+						$prev_post_obj	= get_adjacent_post( $in_same_cat );
+						// Get the previous posts ID
+						$prev_post_ID	= isset( $prev_post_obj->ID ) ? $prev_post_obj->ID : '';
 
-					// Set title & link for the previous post
-					if ( is_single() )
-					{
-						if ( isset( $prev_post_obj ) )
+						// Set title & link for the previous post
+						if ( is_single() )
 						{
-							$prev_post_link		= get_permalink( $prev_post_ID );
-							$prev_post_title	= __( 'Next', self::LANG ).': '.$prev_post_obj->post_title;
+							if ( isset( $prev_post_obj ) )
+							{
+								$prev_post_link		= get_permalink( $prev_post_ID );
+								$prev_post_title	= '&laquo;'; // equals "»"
+								# $prev_post_title	= __( 'Prev', self::LANG ).': '.mb_substr( $prev_post_obj->post_title, 0, 6 );
+							}
 						}
-					}
-					else 
-					{
-						$prev_post_link		= get_bloginfo( 'url' ).'/?s='.get_search_query().'&paged='.( $paged-1 );
-						$prev_post_title	= '&laquo;'; // equals "»"
-					}
-
-					if ( isset( $prev_post_obj ) )
-					{
+						else 
+						{
+							$prev_post_link		= home_url().'/?s='.get_search_query().'&paged='.( $paged-1 );
+							$prev_post_title	= '&laquo;'; // equals "»"
+						}
 						?>
-						<!-- Render Link to the previous post -->
-						<a href="<?php echo $prev_post_link; ?>">
-							<?php echo $prev_post_title; ?>
-						</a>
-						<?php
-						# previous_posts_link(' &laquo; '); // « 
-					} 
-					?>
+					<!-- Render Link to the previous post -->
+					<a href="<?php echo $prev_post_link; ?>" rel="prev">
+						<?php echo $prev_post_title; ?>
+					</a>
+					<?php # previous_posts_link(' &laquo; '); // « ?>
 				</li>
 				<?php 
 			}
 
-			// *******************************************************
-			// We need the sliding effect only if there are more pages than is the sliding range
-			// *******************************************************
-			if ( $max_page > $range ) 
+			// Render, as long as there are more posts found, than we display per page
+			if ( ! $wp_query->query_vars['posts_per_page'] < $wp_query->found_posts )
 			{
-				// When closer to the beginning
-				if ( $paged < $range ) 
+
+				// *******************************************************
+				// We need the sliding effect only if there are more pages than is the sliding range
+				// *******************************************************
+				if ( $max_page > $range ) 
 				{
-					for ( $i = 1; $i <= ( $range+1 ); $i++ ) 
+					// When closer to the beginning
+					if ( $paged < $range ) 
 					{
+						for ( $i = 1; $i <= ( $range+1 ); $i++ ) 
+						{ 
+							$current = '';
+							// Apply the css class "current" if it's the current post
+							if ( $paged === (int) $i )
+							{
+								$current = ' current';
+								# echo _wp_link_page( $i ).'</a>';
+							}
+							?>
+							<li class="pagination-num<?php echo $classes.$current; ?>">
+								<!-- Render page number Link -->
+								<a href="<?php echo get_pagenum_link( $i ); ?>">
+									<?php echo $i; ?>
+								</a>
+							</li>
+							<?php 
+						}
+					}
+					// When closer to the end
+					elseif ( $paged >= ( $max_page - ceil ( $range/2 ) ) ) 
+					{
+						for ( $i = $max_page - $range; $i <= $max_page; $i++ )
+						{ 
+							$current = '';
+							// Apply the css class "current" if it's the current post
+							$current = ( $paged === (int) $i ) ? ' current' : '';
+
+							?>
+							<li class="pagination-num<?php echo $classes.$current; ?>">
+								<!-- Render page number Link -->
+								<a href="<?php echo get_pagenum_link( $i ); ?>">
+									<?php echo $i; ?>
+								</a>
+							</li>
+							<?php 
+						}
+					}
+					// Somewhere in the middle
+					elseif ( $paged >= $range && $paged < ( $max_page - ceil( $range/2 ) ) ) 
+					{
+						for ( $i = ( $paged - ceil( $range/2 ) ); $i <= ( $paged + ceil( $range/2 ) ); $i++ ) 
+						{
+							$current = '';
+							// Apply the css class "current" if it's the current post
+							$current = ( $paged === (int) $i ) ? ' current' : '';
+
+							?>
+							<li class="pagination-num<?php echo $classes.$current; ?>">
+								<!-- Render page number Link -->
+								<a href="<?php echo get_pagenum_link( $i ); ?>">
+									<?php echo $i; ?>
+								</a>
+							</li>
+							<?php 
+						}
+					}
+				}
+				// Less pages than the range, no sliding effect needed
+				else 
+				{
+					for ( $i = 1; $i <= $max_page; $i++ ) 
+					{
+						$current = '';
 						// Apply the css class "current" if it's the current post
-						$class = ( $paged == $i ) ? 'current' : '';
+						$current = ( $paged === (int) $i ) ? ' current' : '';
 
 						?>
-						<li class="pagination-num<?php echo $classes; ?>">
+						<li class="pagination-num<?php echo $classes.$current; ?>">
 							<!-- Render page number Link -->
-							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
+							<a href="<?php echo get_pagenum_link( $i ); ?>">
 								<?php echo $i; ?>
 							</a>
 						</li>
 						<?php 
 					}
-				}
-				// When closer to the end
-				elseif ( $paged >= ( $max_page - ceil ( $range/2 ) ) ) 
-				{
-					for ( $i = $max_page - $range; $i <= $max_page; $i++ )
-					{
-						// Apply the css class "current" if it's the current post
-						$class = ( $i == $paged ) ? 'current' : '';
+				} // endif;
+			} // endif; there are more posts found, than we display per page 
 
-						?>
-						<li class="pagination-num<?php echo $classes; ?>">
-							<!-- Render page number Link -->
-							<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
-								<?php echo $i; ?>
-							</a>
-						</li>
-						<?php 
-					}
-				}
-			}
-			// Somewhere in the middle
-			elseif ( $paged >= $range && $paged < ( $max_page - ceil( $range/2 ) ) ) 
+
+			// *******************************************************
+			// to the last / next page of a paged post
+			// This only get's used on posts/pages that use the <!--nextpage--> quicktag
+			// *******************************************************
+			if ( is_singular() && $numpages > 1 )
 			{
-				for ( $i = ( $paged - ceil( $range/2 ) ); $i <= ( $paged + ceil( $range/2 ) ); $i++ ) 
-				{
-					// Apply the css class "current" if it's the current post
-					$class = ( $i == $paged ) ? 'current' : '';
-
-					?>
-					<li class="pagination-num<?php echo $classes; ?>">
-						<!-- Render page number Link -->
-						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
-							<?php echo $i; ?>
-						</a>
-					</li>
-					<?php 
-				}
+				$echo = false;
+				echo $this->page_links( $this->args );
 			}
-			// Less pages than the range, no sliding effect needed
-			else 
-			{
-				for ( $i = 1; $i <= $max_page; $i++ ) 
-				{
-					// Apply the css class "current" if it's the current post
-					$class = ( $i == $paged ) ? 'current' : '';
 
-					?>
-					<li class="pagination-num<?php echo $classes; ?>">
-						<!-- Render page number Link -->
-						<a class="<?php echo $class; ?>" href="<?php echo get_pagenum_link( $i ); ?>">
-							<?php echo $i; ?>
-						</a>
-					</li>
-					<?php 
-				}
-			} // endif;
 
 			// *******************************************************
 			// to the last / next page
-			// On the last page, don't put the last / next page link
+			// On the last page: don't show the link to the last/next page
 			// *******************************************************
-			if ( $paged != $max_page ) 
-			{
-			?>
+			if ( $paged !== (int) 0 && $paged !== (int) $max_page && $max_page !== (int) 0 && ! is_page() )
+			{ 
+				?>
 				<li class="pagination-next<?php echo $classes; ?>">
 					<?php 
 					# let's use the native fn instead of the previous_/next_posts_link() alias
 					# get_adjacent_post( $in_same_cat = false, $excluded_categories = '', $previous = true )
 
 					// Get the next post object
-					$next_post_obj	= get_adjacent_post( false, '', false );
+					$in_same_cat	= is_category() || is_tag() || is_tax() ? true : false;
+					$next_post_obj	= get_adjacent_post( $in_same_cat, '', false );
 					// Get the next posts ID
-					$next_post_ID	= $next_post_obj->ID;
+					$next_post_ID	= isset( $next_post_obj->ID ) ? $next_post_obj->ID : '';
 
 					// Set title & link for the next post
 					if ( is_single() )
 					{
 						if ( isset( $next_post_obj ) )
 						{
+							# $next_post_link = get_next_posts_link();
+							# $next_post_paged_link = get_next_posts_page_link();
 							$next_post_link		= get_permalink( $next_post_ID );
-							$next_post_title	= __( 'Next', self::LANG ).': '.$next_post_obj->post_title;
+							$next_post_title	= '&raquo;'; // equals "»"
+							# $next_post_title	= __( 'Next', self::LANG ).mb_substr( $next_post_obj->post_title, 0, 6 );
 						}
 					}
 					else 
 					{
-						$next_post_link		= get_bloginfo( 'url' ).'/?s='.get_search_query().'&paged='.( $paged+1 );
+						$next_post_link		= home_url().'/?s='.get_search_query().'&paged='.( $paged+1 );
 						$next_post_title	= '&raquo;'; // equals "»"
 					}
 
@@ -424,24 +561,29 @@ class oxoPagination
 					{
 						?>
 						<!-- Render Link to the next post -->
-						<a href="<?php echo $next_post_link; ?>">
+						<a href="<?php echo $next_post_link; ?>" rel="next">
 							<?php echo $next_post_title; ?>
 						</a>
 						<?php
-						# next_posts_link(' &raquo; '); // » 
+					} 
+					else 
+					{
+						next_posts_link(' &raquo; '); // »
 					} 
 					?>
 				</li>
 
 				<li class="pagination-last<?php echo $classes; ?>">
+					<?php
+					$last_post_link = get_pagenum_link( $max_page ); 
+					?>
 					<!-- Render Link to the last post -->
-					<a href=<?php echo get_pagenum_link( $max_page ); ?>>
+					<a href="<?php echo $last_post_link; ?>" rel="last">
 						<?php _e( 'Last', self::LANG ); ?>
 					</a>
 				</li>
 				<?php 
 			} // endif;
-	
 		?>
 		</ul>
 		<?php

@@ -1,14 +1,21 @@
 h1. Easy Pagination Deamon
 
-version: _v0.1.4.3_
+version: _v0.3._
 
-* Gives you an easy pagination for ex. archives, search results, blog
+* Gives you an easy pagination for ex. archives, search results, blog, paginated posts/pages
 * Works with every type of permalink structure
 * Uses the native @get_adjacent_post()@ fn instead of the @previous_posts_link()@ layer
 
-(Mabye) To come within the next versions: Works for comments too.
-
 License: extended MIT/Expat
+
+h2. Features
+
+h3. Todo: 
+Works for comments too.
+Make all arguments available for both paginated posts/pages and archive templates.
+
+h3. Done:
+Works on paginated posts/pages
 
 h2. Example
 
@@ -18,7 +25,7 @@ _(The @[first]/[last]/[<<]/[>>]@ only get's added if you're not on the first/las
 
 h2. How-to
 
-Simply add @oxo_pagination()@; to your template files.
+Simply add @oxo_pagination()@; inside your template files.
 
 Use the @$args@ array to alter the definitions:
 @$args = array( 'range'	=> 9, 'classes'	=> 'additional css classes' );@
@@ -28,6 +35,27 @@ Then just place it inside your template.
 
 * You can specify an @$args['range']@ ex. @oxo_pagination( array( 'range' => 9 );@ which would display 9 links to pages, where the current one is in the middle. The default is @5@. You should always use a not even number.
 * You can also specify additional classes that get added to the @<li>@ elements. This is pretty handy if you use a css framework like blueprint. Just use @oxo_pagination( array( 'classes' => 'span-1' ) );@ to add classes.
+
+---------------------------
+
+You can use the native wp filter @'wp_link_pages_args'@ to modify the output of your pagination on paginated posts & pages.
+
+<pre>
+$defaults = array( 
+	 'classes'			=> ''
+	,'range'			=> 5
+	,'wrapper'			=> 'li' // element in which we wrap the link 
+	,'highlight'		=> 'current' // class for the current page
+	,'before'			=> ''
+	,'after'			=> ''
+	,'link_before'		=> ''
+	,'link_after'		=> ''
+	,'next_or_number'	=> 'number'
+	,'nextpagelink'		=> 'Next'
+	,'previouspagelink'	=> 'Prev'
+	,'pagelink'			=> '%'
+);
+</pre
 
 h2. Stylesheets
 
@@ -57,3 +85,4 @@ h2. Changelog
 * _v0.1.4.1_ Updated readme & help function, also started preparation for comments pagination
 * _v0.1.4.2_ Bugfix: previous instead of next post object for previous posts link
 * _v0.1.4.3_ Allow alternate stylesheet locations: child, parent theme
+* _v0.3._ Major release: You can now use it for paginated archives/home templates as well as paginated posts/pages.
